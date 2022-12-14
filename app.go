@@ -73,7 +73,7 @@ func PauseJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	}
 	defer response.Body.Close()
 
-	fmt.Printf("Job %s has been triggered to be paused\n", dataSourceId)
+	fmt.Printf("Job %s has been triggered to be paused.\n", dataSourceId)
 
 	return nil
 }
