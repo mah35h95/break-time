@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 func main() {
@@ -43,7 +42,6 @@ func main() {
 			fmt.Println(err)
 		}
 		fmt.Printf("%s - Loop Complete\n", jobids[i])
-		time.Sleep(5 * time.Second)
 	}
 }
 
