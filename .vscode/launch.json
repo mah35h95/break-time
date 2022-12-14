@@ -11,9 +11,9 @@
 			// "console": "integratedTerminal",
 			"program": "${workspaceFolder}/app.go",
 			"env": {
-				"JOBS": "bigquery-source.bigquery.dev_200_itsp_530e8d.snow_present.incident",
+				"JOBS": "",
 				"META_SVC_URL": "https://dice-meta-svc-dot-dev-2367-entdataingst-5a9bf0.appspot.com",
-				"TOKEN": "eyJraWQiOiJXd3FpREFndzl6ZjNtbVJyTnd0TzhSZlVvV1ZEcDlkbm01ZktDZDM1b19JIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULnJtYWZxa2JFdmE5UW9wUlc5UHp4b1hqQ0xlUExpWjRTcmxZeFI4UlB2OGMiLCJpc3MiOiJodHRwczovL3R5c29uLWRldi5va3RhcHJldmlldy5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNjcxMDIwNDkzLCJleHAiOjE2NzEwMjQwOTMsImNpZCI6IjBvYWxwdWk0dXBMY2NkRTdvMGg3IiwidWlkIjoiMDB1eGFrMGVrbUtneEdwRW0waDciLCJzY3AiOlsiV29ya2RheU9rdGFTQU1BY2NvdW50IiwiRGF0YUF0VHlzb24iLCJvcGVuaWQiLCJwcm9maWxlIl0sImF1dGhfdGltZSI6MTY3MTAyMDQ4Miwic3ViIjoiTWFoZXNoLkdAdHlzb24uY29tIn0.FBOcIpzo_IdRKfdtk9TQhmu-NYyH1IsBg6JhGb1uqP5Joly3fck_ZVH9XqBbRbO4XK5YojVv5X-s47ifAcFDhc0eJWOr9WKrtrjLcIxLMXI9EhE8kgNluS5u37VU-vXMovtClqJPqf1cPdJRKnIJHtq22sJCX3eiUybxqB2iSryVUl0CfNFLT66zQCYjifHm96pW9fDV_VHgUyTKMhlxzrQQa3iUWvkAwiL7TQmYg2jUCDxWASbGFrRsitlVpls8S2Z7t9WMwzTk-7_oCe4uqRx3npKTIUOwxhFlFwQl4K4WuuoQUgKQgNy5olUIJGcBXCHLgipAxcJ6DfjPClLwKg"
+				"TOKEN": ""
 			}
 		},
 		{
