@@ -37,9 +37,18 @@ func main() {
 
 	for i := 0; i < len(jobids); i++ {
 		fmt.Printf("%s - Loop Start\n", jobids[i])
+
+		// To Pause Jobs
 		// err := PauseJob(jobids[i], metaSvcUrl, bearer)
+
+		// To Run/Load Jobs
 		err := LoadJob(jobids[i], metaSvcUrl, bearer)
+
+		//! If you don't intend to delete job make sure the below line is commented or the line is removed
+		//! Be Care-full and Think Twice before uncommenting
+		// To DELETE Jobs
 		// err := DeleteJob(jobids[i], metaSvcUrl, bearer)
+
 		if err != nil {
 			fmt.Println(err)
 		}
