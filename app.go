@@ -32,27 +32,33 @@ func main() {
 
 	bearer := "Bearer " + token
 
-	// jobids := []string{"", "", ""}
-	jobids := strings.Split(jobs, "/")
+	// jobIDs := []string{"", "", ""}
+	jobIDs := strings.Split(jobs, "/")
 
-	for i := 0; i < len(jobids); i++ {
-		fmt.Printf("%s - Loop Start\n", jobids[i])
+	for i := 0; i < len(jobIDs); i++ {
+		fmt.Printf("%s - Loop Start\n", jobIDs[i])
 
 		// To Pause Jobs
-		// err := PauseJob(jobids[i], metaSvcUrl, bearer)
+		// err := PauseJob(jobIDs[i], metaSvcUrl, bearer)
+
+		// To Resume Jobs
+		// err := ResumeJob(jobIDs[i], metaSvcUrl, bearer)
+
+		// To Stop Jobs
+		// err := StopJob(jobIDs[i], metaSvcUrl, bearer)
 
 		// To Run/Load Jobs
-		err := LoadJob(jobids[i], metaSvcUrl, bearer)
+		err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
 
 		//! If you don't intend to delete job make sure the below line is commented or the line is removed
 		//! Be Care-full and Think Twice before uncommenting
 		// To DELETE Jobs
-		// err := DeleteJob(jobids[i], metaSvcUrl, bearer)
+		// err := DeleteJob(jobIDs[i], metaSvcUrl, bearer)
 
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Printf("%s - Loop Complete\n", jobids[i])
+		fmt.Printf("%s - Loop Complete\n", jobIDs[i])
 	}
 }
 
@@ -63,6 +69,72 @@ func PauseJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	}
 
 	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/pause", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	body := strings.NewReader(`{}`)
+
+	request, err := http.NewRequest("POST", path, body)
+	if err != nil {
+		return fmt.Errorf("http.NewRequest: %v", err)
+	}
+
+	request.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+	}
+
+	// Send req using http Client
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("client.Do: %v", err)
+	}
+	defer response.Body.Close()
+
+	fmt.Printf("Job %s has been triggered to be paused.\n", dataSourceId)
+
+	return nil
+}
+
+func StopJob(dataSourceId string, metaSvcUrl string, bearer string) error {
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return errors.New("invalid dataSourceId " + dataSourceId)
+	}
+
+	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/stop", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	body := strings.NewReader(`{}`)
+
+	request, err := http.NewRequest("POST", path, body)
+	if err != nil {
+		return fmt.Errorf("http.NewRequest: %v", err)
+	}
+
+	request.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+	}
+
+	// Send req using http Client
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("client.Do: %v", err)
+	}
+	defer response.Body.Close()
+
+	fmt.Printf("Job %s has been triggered to be paused.\n", dataSourceId)
+
+	return nil
+}
+
+func ResumeJob(dataSourceId string, metaSvcUrl string, bearer string) error {
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return errors.New("invalid dataSourceId " + dataSourceId)
+	}
+
+	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/resume", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
 
 	body := strings.NewReader(`{}`)
 
