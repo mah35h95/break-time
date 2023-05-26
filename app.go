@@ -50,6 +50,9 @@ func main() {
 		// To Run/Load Jobs
 		err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
 
+		// To Reload Jobs
+		// err := ReloadJob(jobIDs[i], metaSvcUrl, bearer)
+
 		//! If you don't intend to delete job make sure the below line is commented or the line is removed
 		//! Be Care-full and Think Twice before uncommenting
 		// To DELETE Jobs
@@ -190,6 +193,39 @@ func LoadJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	defer response.Body.Close()
 
 	fmt.Printf("Job %s has been triggered to be run.\n", dataSourceId)
+
+	return nil
+}
+
+func ReloadJob(dataSourceId string, metaSvcUrl string, bearer string) error {
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return errors.New("invalid dataSourceId " + dataSourceId)
+	}
+
+	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/reload", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	body := strings.NewReader(`{}`)
+
+	request, err := http.NewRequest("POST", path, body)
+	if err != nil {
+		return fmt.Errorf("http.NewRequest: %v", err)
+	}
+
+	request.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+	}
+
+	// Send req using http Client
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("client.Do: %v", err)
+	}
+	defer response.Body.Close()
+
+	fmt.Printf("Job %s has been triggered to be Reloaded.\n", dataSourceId)
 
 	return nil
 }
