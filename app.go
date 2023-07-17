@@ -36,7 +36,7 @@ func main() {
 	jobIDs := strings.Split(jobs, "/")
 
 	for i := 0; i < len(jobIDs); i++ {
-		fmt.Printf("%s - Loop Start\n", jobIDs[i])
+		fmt.Printf("(%d/%d): %s - Loop Start\n", i+1, len(jobIDs), jobIDs[i])
 
 		// To Pause Jobs
 		// err := PauseJob(jobIDs[i], metaSvcUrl, bearer)
@@ -61,7 +61,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Printf("%s - Loop Complete\n", jobIDs[i])
+		fmt.Printf("(%d/%d): %s - Loop Complete\n", i+1, len(jobIDs), jobIDs[i])
 	}
 }
 
