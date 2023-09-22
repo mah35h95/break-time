@@ -70,13 +70,12 @@ func main() {
 
 		if err != nil {
 			fmt.Println(err)
-
 			if err.Error() == "403" {
 				fmt.Printf("Update OKTA Auth Token\n")
-				fmt.Printf("(%d/%d) Jobs have Completed\n", i, len(jobIDs))
-				fmt.Printf("Next run starts from => (%d/%d): %s\n", i+1, len(jobIDs), jobIDs[i])
-				os.Exit(1)
 			}
+			fmt.Printf("(%d/%d) Jobs have Completed\n", i, len(jobIDs))
+			fmt.Printf("Next run starts from => (%d/%d): %s\n", i+1, len(jobIDs), jobIDs[i])
+			os.Exit(1)
 		}
 
 		fmt.Printf("(%d/%d): %s - Loop Complete\n", i+1, len(jobIDs), jobIDs[i])
