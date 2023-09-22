@@ -42,27 +42,30 @@ func main() {
 	for i := 0; i < len(jobIDs); i++ {
 		fmt.Printf("(%d/%d): %s - Loop Start\n", i+1, len(jobIDs), jobIDs[i])
 
-		// To Pause Jobs
+		//* To Pause Jobs
 		// err := PauseJob(jobIDs[i], metaSvcUrl, bearer)
 
-		// To Resume Jobs
+		//* To Resume Jobs
 		// err := ResumeJob(jobIDs[i], metaSvcUrl, bearer)
 
-		// To Stop Jobs
+		//* To Stop Jobs
 		// err := StopJob(jobIDs[i], metaSvcUrl, bearer)
 
-		// To Run/Load Jobs
-		err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
+		//* To Run/Load Jobs
+		// err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
 
-		// To Change Cron Schedule
+		//* To Run/Load Jobs
+		err := DeleteHydratedResources(jobIDs[i], metaSvcUrl, bearer)
+
+		//* To Change Cron Schedule
 		// err := EditCronSchedule(jobIDs[i], metaSvcUrl, bearer)
 
-		// To Reload Jobs
+		//* To Reload Jobs
 		// err := ReloadJob(jobIDs[i], metaSvcUrl, bearer)
 
 		//! If you don't intend to delete job make sure the below line is commented or the line is removed
 		//! Be Care-full and Think Twice before uncommenting
-		// To DELETE Jobs
+		//* To DELETE Jobs
 		// err := DeleteJob(jobIDs[i], metaSvcUrl, bearer)
 
 		if err != nil {
@@ -322,7 +325,40 @@ func EditCronSchedule(dataSourceId string, metaSvcUrl string, bearer string) err
 	}
 	defer response2.Body.Close()
 
-	fmt.Printf("%s job's cron has been triggered to be changed.\n", dataSourceId)
+	fmt.Printf("Job %s cron has been triggered to be changed.\n", dataSourceId)
+
+	return nil
+}
+
+func DeleteHydratedResources(dataSourceId string, metaSvcUrl string, bearer string) error {
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return errors.New("invalid dataSourceId " + dataSourceId)
+	}
+
+	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/delete_hydrated_resources", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	body := strings.NewReader(`{}`)
+
+	request, err := http.NewRequest("POST", path, body)
+	if err != nil {
+		return fmt.Errorf("http.NewRequest: %v", err)
+	}
+
+	request.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+	}
+
+	// Send req using http Client
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("client.Do: %v", err)
+	}
+	defer response.Body.Close()
+
+	fmt.Printf("Job %s has been triggered to clean up the hydrated resources.\n", dataSourceId)
 
 	return nil
 }
