@@ -70,7 +70,15 @@ func main() {
 
 		if err != nil {
 			fmt.Println(err)
+
+			if err.Error() == "403" {
+				fmt.Printf("Update OKTA Auth Token\n")
+				fmt.Printf("(%d/%d) Jobs have Completed\n", i, len(jobIDs))
+				fmt.Printf("Next run starts from => (%d/%d): %s\n", i+1, len(jobIDs), jobIDs[i])
+				os.Exit(1)
+			}
 		}
+
 		fmt.Printf("(%d/%d): %s - Loop Complete\n", i+1, len(jobIDs), jobIDs[i])
 	}
 }
@@ -100,6 +108,9 @@ func PauseJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
+	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
 	}
 	defer response.Body.Close()
 
@@ -134,6 +145,9 @@ func StopJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
 	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
+	}
 	defer response.Body.Close()
 
 	fmt.Printf("Job %s has been triggered to be paused.\n", dataSourceId)
@@ -166,6 +180,9 @@ func ResumeJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
+	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
 	}
 	defer response.Body.Close()
 
@@ -200,6 +217,9 @@ func LoadJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
 	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
+	}
 	defer response.Body.Close()
 
 	fmt.Printf("Job %s has been triggered to be run.\n", dataSourceId)
@@ -232,6 +252,9 @@ func ReloadJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
+	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
 	}
 	defer response.Body.Close()
 
@@ -266,6 +289,9 @@ func DeleteJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
 	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
+	}
 	defer response.Body.Close()
 
 	fmt.Printf("Job %s has been triggered to be deleted.\n", dataSourceId)
@@ -297,6 +323,9 @@ func EditCronSchedule(dataSourceId string, metaSvcUrl string, bearer string) err
 	if err2 != nil {
 		return fmt.Errorf("client.Do get: %v", err2)
 	}
+	if response1.StatusCode == 403 {
+		return fmt.Errorf("403")
+	}
 
 	body, err3 := io.ReadAll(response1.Body)
 	if err3 != nil {
@@ -322,6 +351,9 @@ func EditCronSchedule(dataSourceId string, metaSvcUrl string, bearer string) err
 	response2, err6 := client.Do(request2)
 	if err2 != nil {
 		return fmt.Errorf("client.Do post: %v", err6)
+	}
+	if response2.StatusCode == 403 {
+		return fmt.Errorf("403")
 	}
 	defer response2.Body.Close()
 
@@ -355,6 +387,9 @@ func DeleteHydratedResources(dataSourceId string, metaSvcUrl string, bearer stri
 	response, err := client.Do(request)
 	if err != nil {
 		return fmt.Errorf("client.Do: %v", err)
+	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
 	}
 	defer response.Body.Close()
 
