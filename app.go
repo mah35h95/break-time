@@ -278,31 +278,51 @@ func EditCronSchedule(dataSourceId string, metaSvcUrl string, bearer string) err
 
 	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
 
-	httpClient := &http.Client{}
-	fmt.Printf("Getting job data...")
-	req, err := http.NewRequest("GET", path, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request. %v", err)
+	client := &http.Client{}
+
+	fmt.Printf("Getting job data of %s\n", dataSourceId)
+
+	request1, err1 := http.NewRequest("GET", path, nil)
+	if err1 != nil {
+		return fmt.Errorf("http.NewRequest get: %v", err1)
 	}
-	req.Header.Add("Authorization", bearer)
-	resp, _ := httpClient.Do(req)
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read response body. %v", err)
+
+	request1.Header = http.Header{
+		"Authorization": {bearer},
 	}
-	defer resp.Body.Close()
+	response1, err2 := client.Do(request1)
+	if err2 != nil {
+		return fmt.Errorf("client.Do get: %v", err2)
+	}
 
-	newValue, _ := sjson.Set(string(body), "schedule", "0 0 * * *")
+	body, err3 := io.ReadAll(response1.Body)
+	if err3 != nil {
+		return fmt.Errorf("failed to read response body. %v", err3)
+	}
+	defer response1.Body.Close()
 
-	postReq, _ := http.NewRequest("POST", path+"/edit", bytes.NewBuffer([]byte(newValue)))
-	postReq.Header.Add("Authorization", bearer)
-	postReq.Header.Add("Content-Type", "application/json")
-	postReq.Header.Add("Accept", "*/*")
-	resp, _ = httpClient.Do(postReq)
-	// _, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
+	newValue, err4 := sjson.Set(string(body), "schedule", "0 0 * * *")
+	if err4 != nil {
+		return fmt.Errorf("failed to update json value. %v", err4)
+	}
 
-	fmt.Printf("Job's cron %s has been triggered to be changed.\n", dataSourceId)
+	request2, err5 := http.NewRequest("POST", path+"/edit", bytes.NewBuffer([]byte(newValue)))
+	if err5 != nil {
+		return fmt.Errorf("http.NewRequest post: %v", err5)
+	}
+
+	request2.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+		"Accept":        {"*/*"},
+	}
+	response2, err6 := client.Do(request2)
+	if err2 != nil {
+		return fmt.Errorf("client.Do post: %v", err6)
+	}
+	defer response2.Body.Close()
+
+	fmt.Printf("%s job's cron has been triggered to be changed.\n", dataSourceId)
 
 	return nil
 }
