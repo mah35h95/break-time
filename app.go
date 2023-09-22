@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/tidwall/sjson"
 )
 
 func main() {
@@ -49,6 +53,9 @@ func main() {
 
 		// To Run/Load Jobs
 		err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
+
+		// To Change Cron Schedule
+		// err := EditCronSchedule(jobIDs[i], metaSvcUrl, bearer)
 
 		// To Reload Jobs
 		// err := ReloadJob(jobIDs[i], metaSvcUrl, bearer)
@@ -259,6 +266,43 @@ func DeleteJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	defer response.Body.Close()
 
 	fmt.Printf("Job %s has been triggered to be deleted.\n", dataSourceId)
+
+	return nil
+}
+
+func EditCronSchedule(dataSourceId string, metaSvcUrl string, bearer string) error {
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return errors.New("invalid dataSourceId " + dataSourceId)
+	}
+
+	path := fmt.Sprintf("%v/sources/%v/technologies/%v/databases/%v/jobs/%v.%v", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	httpClient := &http.Client{}
+	fmt.Printf("Getting job data...")
+	req, err := http.NewRequest("GET", path, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request. %v", err)
+	}
+	req.Header.Add("Authorization", bearer)
+	resp, _ := httpClient.Do(req)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body. %v", err)
+	}
+	defer resp.Body.Close()
+
+	newValue, _ := sjson.Set(string(body), "schedule", "0 0 * * *")
+
+	postReq, _ := http.NewRequest("POST", path+"/edit", bytes.NewBuffer([]byte(newValue)))
+	postReq.Header.Add("Authorization", bearer)
+	postReq.Header.Add("Content-Type", "application/json")
+	postReq.Header.Add("Accept", "*/*")
+	resp, _ = httpClient.Do(postReq)
+	// _, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	fmt.Printf("Job's cron %s has been triggered to be changed.\n", dataSourceId)
 
 	return nil
 }
