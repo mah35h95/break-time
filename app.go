@@ -52,10 +52,10 @@ func main() {
 		// err := StopJob(jobIDs[i], metaSvcUrl, bearer)
 
 		//* To Run/Load Jobs
-		// err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
+		err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
 
 		//* To Run/Load Jobs
-		err := DeleteHydratedResources(jobIDs[i], metaSvcUrl, bearer)
+		// err := DeleteHydratedResources(jobIDs[i], metaSvcUrl, bearer)
 
 		//* To Change Cron Schedule
 		// err := EditCronSchedule(jobIDs[i], metaSvcUrl, bearer)
