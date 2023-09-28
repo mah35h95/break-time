@@ -68,6 +68,11 @@ func main() {
 		//* To DELETE Jobs
 		// err := DeleteJob(jobIDs[i], metaSvcUrl, bearer)
 
+		//! If you don't intend to delete storage files make sure the below line is commented or the line is removed
+		//! Be Care-full and Think Twice before uncommenting
+		//* To DELETE Jobs storage files
+		// err := DeleteStorage(jobIDs[i], metaSvcUrl, bearer)
+
 		if err != nil {
 			fmt.Println(err)
 			if err.Error() == "403" {
@@ -393,6 +398,46 @@ func DeleteHydratedResources(dataSourceId string, metaSvcUrl string, bearer stri
 	defer response.Body.Close()
 
 	fmt.Printf("Job %s has been triggered to clean up the hydrated resources.\n", dataSourceId)
+
+	return nil
+}
+
+func DeleteStorage(dataSourceId string, metaSvcUrl string, bearer string) error {
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return errors.New("invalid dataSourceId " + dataSourceId)
+	}
+
+	prefix := fmt.Sprintf("%v/%v/%v/%v/%v/", parts[0], parts[1], parts[2], parts[3], parts[4])
+	bucket := fmt.Sprintf("%s-dice-fs", strings.TrimPrefix(strings.TrimSuffix(metaSvcUrl, ".appspot.com"), "https://dice-meta-svc-dot-"))
+
+	path := fmt.Sprintf("%v/callback/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/delete_storage", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	bodyString := fmt.Sprintf(`{"storagePrefixes":[{"prefix":"%s"}],"bucket":"%s"}`, prefix, bucket)
+	body := strings.NewReader(bodyString)
+
+	request, err := http.NewRequest("POST", path, body)
+	if err != nil {
+		return fmt.Errorf("http.NewRequest: %v", err)
+	}
+
+	request.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+	}
+
+	// Send req using http Client
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("client.Do: %v", err)
+	}
+	if response.StatusCode == 403 {
+		return fmt.Errorf("403")
+	}
+	defer response.Body.Close()
+
+	fmt.Printf("Job %s has been triggered to be Delete the storage.\n", dataSourceId)
 
 	return nil
 }
