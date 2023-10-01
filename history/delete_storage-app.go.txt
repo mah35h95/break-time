@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/tidwall/sjson"
 )
@@ -39,6 +40,8 @@ func main() {
 	// jobIDs := []string{"", "", ""}
 	jobIDs := strings.Split(jobs, "/")
 
+	wg := &sync.WaitGroup{}
+
 	for i := 0; i < len(jobIDs); i++ {
 		fmt.Printf("(%d/%d): %s - Loop Start\n", i+1, len(jobIDs), jobIDs[i])
 
@@ -52,7 +55,7 @@ func main() {
 		// err := StopJob(jobIDs[i], metaSvcUrl, bearer)
 
 		//* To Run/Load Jobs
-		err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
+		// err := LoadJob(jobIDs[i], metaSvcUrl, bearer)
 
 		//* To Run/Load Jobs
 		// err := DeleteHydratedResources(jobIDs[i], metaSvcUrl, bearer)
@@ -68,18 +71,26 @@ func main() {
 		//* To DELETE Jobs
 		// err := DeleteJob(jobIDs[i], metaSvcUrl, bearer)
 
-		if err != nil {
-			fmt.Println(err)
-			if err.Error() == "403" {
-				fmt.Printf("Update OKTA Auth Token\n")
-			}
-			fmt.Printf("(%d/%d) Jobs have Completed\n", i, len(jobIDs))
-			fmt.Printf("Next run starts from => (%d/%d): %s\n", i+1, len(jobIDs), jobIDs[i])
-			os.Exit(1)
-		}
+		//! If you don't intend to delete storage files make sure the below line is commented or the line is removed
+		//! Be Care-full and Think Twice before uncommenting
+		//* To DELETE Jobs storage files
+
+		wg.Add(1)
+		go DeleteStorage(wg, jobIDs[i], metaSvcUrl, bearer)
+
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	if err.Error() == "403" {
+		// 		fmt.Printf("Update OKTA Auth Token\n")
+		// 	}
+		// 	fmt.Printf("(%d/%d) Jobs have Completed\n", i, len(jobIDs))
+		// 	fmt.Printf("Next run starts from => (%d/%d): %s\n", i+1, len(jobIDs), jobIDs[i])
+		// 	os.Exit(1)
+		// }
 
 		fmt.Printf("(%d/%d): %s - Loop Complete\n", i+1, len(jobIDs), jobIDs[i])
 	}
+	wg.Wait()
 }
 
 func PauseJob(dataSourceId string, metaSvcUrl string, bearer string) error {
@@ -395,4 +406,44 @@ func DeleteHydratedResources(dataSourceId string, metaSvcUrl string, bearer stri
 	fmt.Printf("Job %s has been triggered to clean up the hydrated resources.\n", dataSourceId)
 
 	return nil
+}
+
+func DeleteStorage(wg *sync.WaitGroup, dataSourceId string, metaSvcUrl string, bearer string) {
+	defer wg.Done()
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		fmt.Println(errors.New("invalid dataSourceId " + dataSourceId))
+	}
+
+	path := fmt.Sprintf("%v/callback/sources/%v/technologies/%v/databases/%v/jobs/%v.%v/delete_storage", metaSvcUrl, parts[0], parts[1], parts[2], parts[3], parts[4])
+
+	bodyBytes, err := os.ReadFile(fmt.Sprintf("./output/%s.txt", dataSourceId))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	body := bytes.NewReader(bodyBytes)
+
+	request, err := http.NewRequest("POST", path, body)
+	if err != nil {
+		fmt.Println(fmt.Errorf("http.NewRequest: %v", err))
+	}
+
+	request.Header = http.Header{
+		"Authorization": {bearer},
+		"Content-Type":  {"application/json"},
+	}
+
+	// Send req using http Client
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Println(fmt.Errorf("client.Do: %v", err))
+	}
+	if response.StatusCode == 403 {
+		fmt.Println(fmt.Errorf("403"))
+	}
+	defer response.Body.Close()
+
+	fmt.Printf("Job %s has been triggered to be Delete the storage.\n", dataSourceId)
 }
