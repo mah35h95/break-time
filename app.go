@@ -348,7 +348,7 @@ func EditCronSchedule(dataSourceId string, metaSvcUrl string, bearer string) err
 		"Accept":        {"*/*"},
 	}
 	response2, err6 := client.Do(request2)
-	if err2 != nil {
+	if err6 != nil {
 		return fmt.Errorf("client.Do post: %v", err6)
 	}
 	if response2.StatusCode == 403 {
