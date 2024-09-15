@@ -56,7 +56,7 @@ func main() {
 	for i := 0; i < len(chunkJobIDs); i++ {
 		jobIDs := chunkJobIDs[i]
 
-		err := ValidateAndRefreshToken(metaSvcUrl, &bearer)
+		bearer, err = ValidateAndRefreshToken(metaSvcUrl, bearer)
 		if err != nil {
 			fmt.Printf("(%d/%d) Jobs have Completed\n", i*chunkSize, len(allJobIDs))
 			fmt.Printf("Next run starts from => (%d/%d): %s\n", i*chunkSize+1, len(allJobIDs), jobIDs[0])
@@ -122,30 +122,28 @@ func main() {
 }
 
 // ValidateAndRefreshToken - validates and refreshed token when required for every batch
-func ValidateAndRefreshToken(metaSvcUrl string, bearer *string) error {
+func ValidateAndRefreshToken(metaSvcUrl, bearer string) (string, error) {
+	newBearer := bearer
 	retryCount := 5
 
 	for i := 0; i < retryCount; i++ {
-		err := dice.ValidateToken(metaSvcUrl, *bearer)
+		err := dice.ValidateToken(metaSvcUrl, newBearer)
 
 		if err != nil {
 			fmt.Println(err)
 
 			if err.Error() == "403" {
 				fmt.Printf("Updating Identity Token...(%d)\n", i+1)
-
-				newBearer := fmt.Sprintf("Bearer %s", auth.GetIdentityToken())
-				bearer = &newBearer
-
+				newBearer = fmt.Sprintf("Bearer %s", auth.GetIdentityToken())
 				continue
 			}
 
-			return err
+			return newBearer, err
 		}
 
-		return nil
+		return newBearer, nil
 	}
 
 	fmt.Printf("Failed to update Identity Token for %d times\nExiting...\n", retryCount)
-	return fmt.Errorf("unable to refresh identity token")
+	return newBearer, fmt.Errorf("unable to refresh identity token")
 }
