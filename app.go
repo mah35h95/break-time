@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/tidwall/sjson"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 
-	fmt.Println("Fetching env variables...")
+	fmt.Println("Fetching ENV variables...")
 
 	jobs, ok := os.LookupEnv("JOBS")
 	if !ok || len(jobs) == 0 {
@@ -28,18 +29,15 @@ func main() {
 		os.Exit(0)
 	}
 
-	token, ok := os.LookupEnv("TOKEN")
-	if !ok || len(token) == 0 {
-		fmt.Println("TOKEN env variable is not set in launch.json")
-		os.Exit(0)
-	}
-
-	bearer := "Bearer " + token
+	fmt.Println("Fetching Identity Token...")
+	bearer := fmt.Sprintf("Bearer %s", getIdentityToken())
 
 	// jobIDs := []string{"", "", ""}
 	jobIDs := strings.Split(jobs, "/")
 
-	for i := 0; i < len(jobIDs); i++ {
+	retryCount := 0
+
+	for i := 0; i < len(jobIDs); {
 		fmt.Printf("(%d/%d): %s - Loop Start\n", i+1, len(jobIDs), jobIDs[i])
 
 		//* To Pause Jobs
@@ -70,16 +68,37 @@ func main() {
 
 		if err != nil {
 			fmt.Println(err)
+
 			if err.Error() == "403" {
-				fmt.Printf("Update OKTA Auth Token\n")
+				if retryCount < 5 {
+					fmt.Printf("Updating Identity Token...(%d)\n", retryCount+1)
+
+					bearer = fmt.Sprintf("Bearer %s", getIdentityToken())
+					retryCount++
+
+					continue
+				}
+				fmt.Printf("Failed to update Identity Token for %d times\nExiting...\n", retryCount)
 			}
+
 			fmt.Printf("(%d/%d) Jobs have Completed\n", i, len(jobIDs))
 			fmt.Printf("Next run starts from => (%d/%d): %s\n", i+1, len(jobIDs), jobIDs[i])
 			os.Exit(1)
 		}
 
 		fmt.Printf("(%d/%d): %s - Loop Complete\n", i+1, len(jobIDs), jobIDs[i])
+
+		retryCount = 0
+		i++
 	}
+}
+
+func getIdentityToken() string {
+	out, err := exec.Command("gcloud", "auth", "print-identity-token").Output()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return strings.ReplaceAll(strings.ReplaceAll(string(out), "\r", ""), "\n", "")
 }
 
 func PauseJob(dataSourceId string, metaSvcUrl string, bearer string) error {
@@ -185,7 +204,7 @@ func ResumeJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	}
 	defer response.Body.Close()
 
-	fmt.Printf("Job %s has been triggered to be paused.\n", dataSourceId)
+	fmt.Printf("Job %s has been triggered to be resumed.\n", dataSourceId)
 
 	return nil
 }
