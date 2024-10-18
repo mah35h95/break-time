@@ -16,6 +16,7 @@ const (
 	Stop              string = "stop"
 	Resume            string = "resume"
 	Load              string = "load"
+	Lock              string = "lock"
 	Reload            string = "reload"
 	Delete            string = "delete"
 	DeleteHydratedRes string = "delete_hydrated_resources"
