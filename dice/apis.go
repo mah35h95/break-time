@@ -17,6 +17,7 @@ const (
 	Resume            string = "resume"
 	Load              string = "load"
 	Lock              string = "lock"
+	Unlock            string = "unlock"
 	Reload            string = "reload"
 	Delete            string = "delete"
 	DeleteHydratedRes string = "delete_hydrated_resources"

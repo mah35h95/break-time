@@ -97,6 +97,9 @@ func main() {
 				case dice.Lock:
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Lock, body)
 
+				case dice.Unlock:
+					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Unlock, body)
+
 				case dice.Reload:
 					body = `{}`
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Reload, body)
