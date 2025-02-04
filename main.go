@@ -108,8 +108,8 @@ func main() {
 					err = dice.DeleteJob(dataSourceId, metaSvcUrl, bearer)
 
 				case dice.EditCron:
-					cron := getCron((chunkSize * i) + j + 1)
-					err = dice.EditCronSchedule(dataSourceId, metaSvcUrl, bearer, cron)
+					cron, cronTimeZone := getCron((chunkSize * i) + j + 1)
+					err = dice.EditCronSchedule(dataSourceId, metaSvcUrl, bearer, cron, cronTimeZone)
 
 				case dice.DeleteHydratedRes:
 					err = dice.DeleteHydratedResources(dataSourceId, metaSvcUrl, bearer)
@@ -162,7 +162,9 @@ func ValidateAndRefreshToken(metaSvcUrl, bearer string) (string, error) {
 }
 
 // getCron - returns an increasing cron string
-func getCron(value int) string {
+func getCron(value int) (string, string) {
+	cronTimeZone := "America/Chicago"
+
 	cronRanges := []CronRange{
 		{Min: 1, Max: 100, Cron: "0 0 * * *"},
 		{Min: 101, Max: 200, Cron: "0 1 * * *"},
@@ -178,9 +180,9 @@ func getCron(value int) string {
 
 	for _, cronRange := range cronRanges {
 		if value >= cronRange.Min && value <= cronRange.Max {
-			return cronRange.Cron
+			return cronRange.Cron, cronTimeZone
 		}
 	}
 
-	return "0 0 * * *"
+	return "0 0 * * *", cronTimeZone
 }

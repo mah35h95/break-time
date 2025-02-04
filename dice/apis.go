@@ -147,7 +147,7 @@ func DeleteJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 }
 
 // EditCronSchedule - edits jobs to have the given cron schedule
-func EditCronSchedule(dataSourceId, metaSvcUrl, bearer, cron string) error {
+func EditCronSchedule(dataSourceId, metaSvcUrl, bearer, cron, cronTimeZone string) error {
 	parts := strings.Split(dataSourceId, ".")
 	if len(parts) != 5 {
 		return errors.New("invalid dataSourceId " + dataSourceId)
@@ -166,36 +166,41 @@ func EditCronSchedule(dataSourceId, metaSvcUrl, bearer, cron string) error {
 
 	fmt.Printf("Getting job data of %s\n", dataSourceId)
 
-	request1, err1 := http.NewRequest(http.MethodGet, path, nil)
-	if err1 != nil {
-		return fmt.Errorf("http.NewRequest get: %v", err1)
+	request1, err := http.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return fmt.Errorf("http.NewRequest get: %v", err)
 	}
 
 	request1.Header = http.Header{
 		"Authorization": {bearer},
 	}
-	response1, err2 := client.Do(request1)
-	if err2 != nil {
-		return fmt.Errorf("client.Do get: %v", err2)
+	response1, err := client.Do(request1)
+	if err != nil {
+		return fmt.Errorf("client.Do get: %v", err)
 	}
 	if response1.StatusCode == 403 {
 		return fmt.Errorf("403")
 	}
 
-	body, err3 := io.ReadAll(response1.Body)
-	if err3 != nil {
-		return fmt.Errorf("failed to read response body. %v", err3)
+	body, err := io.ReadAll(response1.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body. %v", err)
 	}
 	defer response1.Body.Close()
 
-	newValue, err4 := sjson.Set(string(body), "schedule", cron)
-	if err4 != nil {
-		return fmt.Errorf("failed to update json value. %v", err4)
+	newScheduleValue, err := sjson.Set(string(body), "schedule", cron)
+	if err != nil {
+		return fmt.Errorf("failed to update json value. %v", err)
 	}
 
-	request2, err5 := http.NewRequest(http.MethodPost, path+"/edit", bytes.NewBuffer([]byte(newValue)))
-	if err5 != nil {
-		return fmt.Errorf("http.NewRequest post: %v", err5)
+	newScheduleTimeZone, err := sjson.Set(newScheduleValue, "cronTimezone", cronTimeZone)
+	if err != nil {
+		return fmt.Errorf("failed to update json value. %v", err)
+	}
+
+	request2, err := http.NewRequest(http.MethodPost, path+"/edit", bytes.NewBuffer([]byte(newScheduleTimeZone)))
+	if err != nil {
+		return fmt.Errorf("http.NewRequest post: %v", err)
 	}
 
 	request2.Header = http.Header{
@@ -203,9 +208,9 @@ func EditCronSchedule(dataSourceId, metaSvcUrl, bearer, cron string) error {
 		"Content-Type":  {"application/json"},
 		"Accept":        {"*/*"},
 	}
-	response2, err6 := client.Do(request2)
-	if err6 != nil {
-		return fmt.Errorf("client.Do post: %v", err6)
+	response2, err := client.Do(request2)
+	if err != nil {
+		return fmt.Errorf("client.Do post: %v", err)
 	}
 	if response2.StatusCode == 403 {
 		return fmt.Errorf("403")
