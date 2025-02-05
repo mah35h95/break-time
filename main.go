@@ -167,15 +167,15 @@ func getCron(value int) (string, string) {
 
 	cronRanges := []CronRange{
 		{Min: 1, Max: 100, Cron: "0 0 * * *"},
-		{Min: 101, Max: 200, Cron: "30 0 * * *"},
-		{Min: 201, Max: 300, Cron: "0 1 * * *"},
-		{Min: 301, Max: 400, Cron: "30 1 * * *"},
-		{Min: 401, Max: 500, Cron: "0 2 * * *"},
-		{Min: 501, Max: 600, Cron: "30 2 * * *"},
-		{Min: 601, Max: 700, Cron: "0 3 * * *"},
-		{Min: 701, Max: 800, Cron: "30 3 * * *"},
-		{Min: 801, Max: 900, Cron: "0 4 * * *"},
-		{Min: 901, Max: 1000, Cron: "30 4 * * *"},
+		{Min: 101, Max: 200, Cron: "0 1 * * *"},
+		{Min: 201, Max: 300, Cron: "0 2 * * *"},
+		{Min: 301, Max: 400, Cron: "0 3 * * *"},
+		{Min: 401, Max: 500, Cron: "0 4 * * *"},
+		{Min: 501, Max: 600, Cron: "0 5 * * *"},
+		{Min: 601, Max: 700, Cron: "0 6 * * *"},
+		{Min: 701, Max: 800, Cron: "0 7 * * *"},
+		{Min: 801, Max: 900, Cron: "0 8 * * *"},
+		{Min: 901, Max: 1000, Cron: "0 9 * * *"},
 	}
 
 	for _, cronRange := range cronRanges {
