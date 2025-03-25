@@ -101,7 +101,7 @@ func main() {
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Unlock, body)
 
 				case dice.Reload:
-					body = `{}`
+					body = `{"keepFoundryDataset": true,"retainData": false}`
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Reload, body)
 
 				case dice.Delete:
