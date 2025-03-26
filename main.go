@@ -104,6 +104,10 @@ func main() {
 					body = `{"keepFoundryDataset": true,"retainData": false}`
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Reload, body)
 
+				case dice.EditGCPTarget:
+					body = `{"targetProjectIds": ["prep-2134-entdatalake-969cbf","qa-2134-entdatalake-d057be"],"jdbcTargets": []}`
+					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Edit, body)
+
 				case dice.Delete:
 					err = dice.DeleteJob(dataSourceId, metaSvcUrl, bearer)
 

@@ -21,7 +21,9 @@ const (
 	Reload            string = "reload"
 	Delete            string = "delete"
 	DeleteHydratedRes string = "delete_hydrated_resources"
+	Edit              string = "edit"
 	EditCron          string = "edit_cron"
+	EditGCPTarget     string = "edit_gcp_target"
 )
 
 // ValidateToken - validates token with dice meta api
