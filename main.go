@@ -60,7 +60,7 @@ func main() {
 
 	chunkJobIDs := utils.ChunkJobs(allJobIDs, chunkSize)
 
-	for i := 0; i < len(chunkJobIDs); i++ {
+	for i := range chunkJobIDs {
 		jobIDs := chunkJobIDs[i]
 
 		bearer, err = ValidateAndRefreshToken(metaSvcUrl, bearer)
@@ -73,7 +73,7 @@ func main() {
 		wg := sync.WaitGroup{}
 		wg.Add(len(jobIDs))
 
-		for j := 0; j < len(jobIDs); j++ {
+		for j := range jobIDs {
 			dataSourceId := jobIDs[j]
 			fmt.Printf("(%d/%d): %s - Start\n", (chunkSize*i)+j+1, len(allJobIDs), dataSourceId)
 
@@ -143,7 +143,7 @@ func ValidateAndRefreshToken(metaSvcUrl, bearer string) (string, error) {
 	newBearer := bearer
 	retryCount := 5
 
-	for i := 0; i < retryCount; i++ {
+	for i := range retryCount {
 		err := dice.ValidateToken(metaSvcUrl, newBearer)
 
 		if err != nil {
