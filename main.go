@@ -49,7 +49,7 @@ func main() {
 	}
 
 	fmt.Println("Fetching Identity Token...")
-	bearer := fmt.Sprintf("Bearer %s", auth.GetIdentityToken())
+	bearer := auth.GetIdentityToken()
 
 	allJobIDs := strings.Split(jobs, "/")
 
@@ -151,7 +151,7 @@ func ValidateAndRefreshToken(metaSvcUrl, bearer string) (string, error) {
 
 			if err.Error() == "403" {
 				fmt.Printf("Updating Identity Token...(%d)\n", i+1)
-				newBearer = fmt.Sprintf("Bearer %s", auth.GetIdentityToken())
+				newBearer = auth.GetIdentityToken()
 				continue
 			}
 
