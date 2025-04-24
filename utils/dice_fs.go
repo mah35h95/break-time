@@ -33,7 +33,7 @@ func GetFsDirsToClean(bucketName, dataSourceId, bearer string) []string {
 		dirs, nextPageToken := getDirs(pageToken, prefix, bearer, bucketName)
 		allDirs = append(allDirs, dirs...)
 
-		fmt.Printf("%s: Fetched files %d times", dataSourceId, count)
+		fmt.Printf("%s: Fetched files %d times\n", dataSourceId, count)
 		count++
 
 		pageToken = nextPageToken
@@ -69,7 +69,7 @@ func getDirs(pageToken, prefix, bearer, bucketName string) ([]string, string) {
 
 	req, err := http.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
-		fmt.Printf("New Request Create: %+v", err)
+		fmt.Printf("New Request Create: %+v\n", err)
 		return []string{}, ""
 	}
 
@@ -82,26 +82,26 @@ func getDirs(pageToken, prefix, bearer, bucketName string) ([]string, string) {
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Http Do: %+v", err)
+		fmt.Printf("Http Do: %+v\n", err)
 		return []string{}, ""
 	}
 	if res.StatusCode == 403 {
-		fmt.Printf("Un-Authorized: %+v", err)
+		fmt.Printf("Un-Authorized: %+v\n", err)
 		return []string{}, ""
 	}
 	defer res.Body.Close()
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Printf("Read Body: %+v", err)
+		fmt.Printf("Read Body: %+v\n", err)
 		return []string{}, ""
 	}
 
 	gcsListRes := GcsListResponce{}
 	err = json.Unmarshal(resBody, &gcsListRes)
 	if err != nil {
-		fmt.Printf("JSON Unmarshaling: %+v", err)
-		fmt.Printf("%s", string(resBody))
+		fmt.Printf("JSON Unmarshaling: %+v\n", err)
+		fmt.Printf("%s\n", string(resBody))
 		return []string{}, ""
 	}
 
