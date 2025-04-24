@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,6 +13,16 @@ import (
 	"github.com/mah35h95/break-time/dice"
 	"github.com/mah35h95/break-time/utils"
 )
+
+// CronRange - Has a min max value for a cron string
+type DeleteStorage struct {
+	Bucket          string          `json:"bucket"`
+	StoragePrefixes []StoragePrefix `json:"storagePrefixes"`
+}
+
+type StoragePrefix struct {
+	Prefix string `json:"prefix"`
+}
 
 // CronRange - Has a min max value for a cron string
 type CronRange struct {
@@ -30,11 +41,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	metaSvcUrl, ok := os.LookupEnv("META_SVC_URL")
-	if !ok || len(metaSvcUrl) == 0 {
-		fmt.Println("META_SVC_URL env variable is not set in launch.json, aborting...")
+	project, ok := os.LookupEnv("PROJECT")
+	if !ok || len(project) == 0 {
+		fmt.Println("PROJECT env variable is not set in launch.json, aborting...")
 		os.Exit(0)
 	}
+	metaSvcUrl := fmt.Sprintf("https://dice-meta-svc-dot-%s.appspot.com", project)
 
 	cmd, ok := os.LookupEnv("CMD")
 	if !ok || len(cmd) == 0 {
@@ -48,9 +60,6 @@ func main() {
 		chunkSizeString = "5"
 	}
 
-	fmt.Println("Fetching Identity Token...")
-	bearer := auth.GetIdentityToken()
-
 	allJobIDs := strings.Split(jobs, "/")
 
 	chunkSize, err := strconv.Atoi(chunkSizeString)
@@ -63,12 +72,18 @@ func main() {
 	for i := range chunkJobIDs {
 		jobIDs := chunkJobIDs[i]
 
-		bearer, err = ValidateAndRefreshToken(metaSvcUrl, bearer)
-		if err != nil {
-			fmt.Printf("(%d/%d) Jobs have Completed\n", i*chunkSize, len(allJobIDs))
-			fmt.Printf("Next run starts from => (%d/%d): %s\n", i*chunkSize+1, len(allJobIDs), jobIDs[0])
-			os.Exit(1)
-		}
+		fmt.Println("Fetching Identity Token...")
+		bearer := auth.GetIdentityToken()
+
+		fmt.Println("Fetching Access Token...")
+		assesBearer := auth.GetAccessToken()
+
+		// bearer, err = ValidateAndRefreshToken(metaSvcUrl, bearer)
+		// if err != nil {
+		// 	fmt.Printf("(%d/%d) Jobs have Completed\n", i*chunkSize, len(allJobIDs))
+		// 	fmt.Printf("Next run starts from => (%d/%d): %s\n", i*chunkSize+1, len(allJobIDs), jobIDs[0])
+		// 	os.Exit(1)
+		// }
 
 		wg := sync.WaitGroup{}
 		wg.Add(len(jobIDs))
@@ -117,6 +132,39 @@ func main() {
 
 				case dice.DeleteHydratedRes:
 					err = dice.DeleteHydratedResources(dataSourceId, metaSvcUrl, bearer)
+
+				case dice.CleanFS:
+					bucketName := fmt.Sprintf("%s-dice-fs", project)
+
+					dirs := utils.GetFsDirsToClean(bucketName, dataSourceId, assesBearer)
+					deleteChunk := 100
+
+					for i := 0; i < len(dirs); {
+						dirDeleteReq := DeleteStorage{
+							Bucket:          bucketName,
+							StoragePrefixes: []StoragePrefix{},
+						}
+
+						for j := 0; i < len(dirs) && j < deleteChunk; j++ {
+							dirDeleteReq.StoragePrefixes = append(
+								dirDeleteReq.StoragePrefixes,
+								StoragePrefix{Prefix: dirs[i]},
+							)
+							i++
+						}
+
+						byteBody, err := json.Marshal(dirDeleteReq)
+						if err != nil {
+							fmt.Printf("JSON Marshal: %+v\n", err)
+							os.Exit(0)
+						}
+
+						body := string(byteBody)
+						err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.DeleteStorage, body)
+						if err != nil {
+							fmt.Println(err)
+						}
+					}
 
 				default:
 					fmt.Println("CMD provided does not match with predefined cases, aborting...")

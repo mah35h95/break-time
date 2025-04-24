@@ -24,6 +24,8 @@ const (
 	Edit              string = "edit"
 	EditCron          string = "edit_cron"
 	EditGCPTarget     string = "edit_gcp_target"
+	CleanFS           string = "clean_fs"
+	DeleteStorage     string = "delete_storage"
 )
 
 // ValidateToken - validates token with dice meta api

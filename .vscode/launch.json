@@ -13,7 +13,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"JOBS": "",
-				"META_SVC_URL": "https://dice-meta-svc-dot-dev-2367-entdataingst-5a9bf0.appspot.com",
+				"PROJECT": "dev-2367-entdataingst-5a9bf0",
 				"CMD": "",
 				"CHUNK_SIZE": ""
 			}
@@ -27,7 +27,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"JOBS": "",
-				"META_SVC_URL": "https://dice-meta-svc-dot-qa-2367-entdataingst-c1271b.appspot.com",
+				"PROJECT": "qa-2367-entdataingst-c1271b",
 				"CMD": "",
 				"CHUNK_SIZE": ""
 			}
@@ -41,7 +41,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"JOBS": "",
-				"META_SVC_URL": "https://dice-meta-svc-dot-prep-2367-entdataingst-804660.appspot.com",
+				"PROJECT": "prep-2367-entdataingst-804660",
 				"CMD": "",
 				"CHUNK_SIZE": ""
 			}
@@ -55,7 +55,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"JOBS": "",
-				"META_SVC_URL": "https://dice-meta-svc-dot-prod-2367-entdataingst-7010d5.appspot.com",
+				"PROJECT": "prod-2367-entdataingst-7010d5",
 				"CMD": "",
 				"CHUNK_SIZE": ""
 			}
