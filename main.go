@@ -164,6 +164,11 @@ func main() {
 						if err != nil {
 							fmt.Println(err)
 						}
+
+						if len(dirs) > deleteChunk {
+							fmt.Println("Fetching Identity Token...")
+							bearer = auth.GetIdentityToken()
+						}
 					}
 
 				default:

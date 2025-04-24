@@ -28,9 +28,13 @@ func GetFsDirsToClean(bucketName, dataSourceId, bearer string) []string {
 	prefix := fmt.Sprintf("%s/transactions/", strings.ReplaceAll(dataSourceId, ".", "/"))
 	pageToken := ""
 
+	count := 1
 	for {
 		dirs, nextPageToken := getDirs(pageToken, prefix, bearer, bucketName)
 		allDirs = append(allDirs, dirs...)
+
+		fmt.Printf("%s: Fetched files %d times", dataSourceId, count)
+		count++
 
 		pageToken = nextPageToken
 		if pageToken == "" {
