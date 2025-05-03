@@ -75,8 +75,11 @@ func main() {
 		fmt.Println("Fetching Identity Token...")
 		bearer := auth.GetIdentityToken()
 
-		fmt.Println("Fetching Access Token...")
-		assesBearer := auth.GetAccessToken()
+		assesBearer := ""
+		if cmd == dice.CleanFS {
+			fmt.Println("Fetching Access Token...")
+			assesBearer = auth.GetAccessToken()
+		}
 
 		// bearer, err = ValidateAndRefreshToken(metaSvcUrl, bearer)
 		// if err != nil {
