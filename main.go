@@ -76,7 +76,7 @@ func main() {
 		bearer := auth.GetIdentityToken()
 
 		assesBearer := ""
-		if cmd == dice.CleanFS {
+		if cmd == dice.CleanFS || cmd == dice.ListFS {
 			fmt.Println("Fetching Access Token...")
 			assesBearer = auth.GetAccessToken()
 		}
@@ -173,6 +173,15 @@ func main() {
 							bearer = auth.GetIdentityToken()
 						}
 					}
+				case dice.ListFS:
+					bucketName := fmt.Sprintf("%s-dice-fs", project)
+
+					dirs := utils.GetFsDirs(bucketName, dataSourceId, assesBearer)
+					dirsJson, err := json.Marshal(dirs)
+					if err != nil {
+						fmt.Println(err)
+					}
+					utils.WriteToFile(fmt.Sprintf("%s.json", dataSourceId), dirsJson)
 
 				default:
 					fmt.Println("CMD provided does not match with predefined cases, aborting...")

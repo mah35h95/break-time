@@ -107,3 +107,31 @@ func getDirs(pageToken, prefix, bearer, bucketName string) ([]string, string) {
 
 	return gcsListRes.Prefixes, gcsListRes.NextPageToken
 }
+
+func GetFsDirs(bucketName, dataSourceId, bearer string) []string {
+	allDirs := []string{}
+
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return allDirs
+	}
+
+	prefix := fmt.Sprintf("%s/transactions/", strings.ReplaceAll(dataSourceId, ".", "/"))
+	pageToken := ""
+
+	count := 1
+	for {
+		dirs, nextPageToken := getDirs(pageToken, prefix, bearer, bucketName)
+		allDirs = append(allDirs, dirs...)
+
+		fmt.Printf("%s: Fetched files %d times\n", dataSourceId, count)
+		count++
+
+		pageToken = nextPageToken
+		if pageToken == "" {
+			break
+		}
+	}
+
+	return allDirs
+}
