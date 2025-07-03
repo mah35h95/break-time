@@ -116,7 +116,7 @@ func GetFsDirs(bucketName, dataSourceId, bearer string) []string {
 		return allDirs
 	}
 
-	prefix := fmt.Sprintf("%s/transactions/", strings.ReplaceAll(dataSourceId, ".", "/"))
+	prefix := fmt.Sprintf("%s/current/", strings.ReplaceAll(dataSourceId, ".", "/"))
 	pageToken := ""
 
 	count := 1

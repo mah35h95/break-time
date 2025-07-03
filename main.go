@@ -175,13 +175,11 @@ func main() {
 					}
 				case dice.ListFS:
 					bucketName := fmt.Sprintf("%s-dice-fs", project)
-
 					dirs := utils.GetFsDirs(bucketName, dataSourceId, assesBearer)
-					dirsJson, err := json.Marshal(dirs)
-					if err != nil {
-						fmt.Println(err)
+
+					if len(dirs) > 2 {
+						fmt.Printf("Excess (%d) folders in %s\n", len(dirs)-2, dataSourceId)
 					}
-					utils.WriteToFile(fmt.Sprintf("%s.json", dataSourceId), dirsJson)
 
 				default:
 					fmt.Println("CMD provided does not match with predefined cases, aborting...")
