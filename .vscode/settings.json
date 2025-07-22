@@ -1,3 +1,11 @@
 {
-	"cSpell.words": ["appspot", "gcloud", "sjson", "tidwall"]
+	"cSpell.words": ["appspot", "gcloud", "sjson", "tidwall"],
+	"java.jdt.ls.java.home": "/Users/gm/.local/share/mise/installs/java/17.0.2",
+	"java.import.gradle.java.home": "/Users/gm/.local/share/mise/installs/java/17.0.2",
+	"go.goroot": "/Users/gm/.local/share/mise/installs/go/1.24.5",
+	"python.defaultInterpreterPath": "/Users/gm/.local/share/mise/installs/python/3.13.5/bin/python",
+	"go.alternateTools": {
+		"go": "/Users/gm/.local/share/mise/shims/go",
+		"gopls": "/Users/gm/.local/share/mise/shims/gopls"
+	}
 }
