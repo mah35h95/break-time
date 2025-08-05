@@ -193,7 +193,7 @@ func main() {
 						fmt.Println("Error writing file:", err)
 						return
 					}
-					fmt.Printf("Data written successfully %s\n", dataSourceId)
+					fmt.Printf("Data written successfully for %s\n", dataSourceId)
 
 				default:
 					fmt.Println("CMD provided does not match with predefined cases, aborting...")
