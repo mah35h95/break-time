@@ -17,7 +17,7 @@ type GcsListResponce struct {
 	Prefixes      []string `json:"prefixes"`
 }
 
-func GetFsDirsToClean(bucketName, dataSourceId, bearer string) []string {
+func GetTransactionsDirs(bucketName, dataSourceId, bearer string) []string {
 	allDirs := []string{}
 
 	parts := strings.Split(dataSourceId, ".")
@@ -55,6 +55,7 @@ func GetFsDirsToClean(bucketName, dataSourceId, bearer string) []string {
 
 func getDirs(pageToken, prefix, bearer, bucketName string) ([]string, string) {
 	queryParams := url.Values{
+		"versions":   []string{"true"},
 		"delimiter":  []string{"/"},
 		"maxResults": []string{fmt.Sprint(math.MaxInt32)},
 		"pageToken":  []string{pageToken},
@@ -108,7 +109,7 @@ func getDirs(pageToken, prefix, bearer, bucketName string) ([]string, string) {
 	return gcsListRes.Prefixes, gcsListRes.NextPageToken
 }
 
-func GetFsDirs(bucketName, dataSourceId, bearer string) []string {
+func GetCurrentDirs(bucketName, dataSourceId, bearer string) []string {
 	allDirs := []string{}
 
 	parts := strings.Split(dataSourceId, ".")
@@ -132,6 +133,50 @@ func GetFsDirs(bucketName, dataSourceId, bearer string) []string {
 			break
 		}
 	}
+
+	n := 2 // Number of elements to remove from the end
+
+	if len(allDirs) >= n {
+		allDirs = allDirs[:len(allDirs)-n]
+	} else {
+		allDirs = []string{}
+	}
+
+	return allDirs
+}
+
+func GetDeltaDirs(bucketName, dataSourceId, bearer string) []string {
+	allDirs := []string{}
+
+	parts := strings.Split(dataSourceId, ".")
+	if len(parts) != 5 {
+		return allDirs
+	}
+
+	prefix := fmt.Sprintf("%s/delta/", strings.ReplaceAll(dataSourceId, ".", "/"))
+	pageToken := ""
+
+	count := 1
+	for {
+		dirs, nextPageToken := getDirs(pageToken, prefix, bearer, bucketName)
+		allDirs = append(allDirs, dirs...)
+
+		fmt.Printf("%s: Fetched files %d times\n", dataSourceId, count)
+		count++
+
+		pageToken = nextPageToken
+		if pageToken == "" {
+			break
+		}
+	}
+
+	// n := 2 // Number of elements to remove from the end
+
+	// if len(allDirs) >= n {
+	// 	allDirs = allDirs[:len(allDirs)-n]
+	// } else {
+	// 	allDirs = []string{}
+	// }
 
 	return allDirs
 }

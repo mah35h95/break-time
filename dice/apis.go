@@ -25,7 +25,8 @@ const (
 	EditCron          string = "edit_cron"
 	EditGCPTarget     string = "edit_gcp_target"
 	CleanFS           string = "clean_fs"
-	ListFS            string = "list_fs"
+	ListCurrentFS     string = "list_current_fs"
+	ListAllFS         string = "list_all_fs"
 	DeleteStorage     string = "delete_storage"
 )
 

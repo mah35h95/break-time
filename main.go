@@ -76,7 +76,7 @@ func main() {
 		bearer := auth.GetIdentityToken()
 
 		assesBearer := ""
-		if cmd == dice.CleanFS || cmd == dice.ListFS {
+		if cmd == dice.CleanFS || cmd == dice.ListCurrentFS || cmd == dice.ListAllFS {
 			fmt.Println("Fetching Access Token...")
 			assesBearer = auth.GetAccessToken()
 		}
@@ -139,7 +139,7 @@ func main() {
 				case dice.CleanFS:
 					bucketName := fmt.Sprintf("%s-dice-fs", project)
 
-					dirs := utils.GetFsDirsToClean(bucketName, dataSourceId, assesBearer)
+					dirs := utils.GetTransactionsDirs(bucketName, dataSourceId, assesBearer)
 					deleteChunk := 100
 
 					for i := 0; i < len(dirs); {
@@ -173,13 +173,27 @@ func main() {
 							bearer = auth.GetIdentityToken()
 						}
 					}
-				case dice.ListFS:
+				case dice.ListCurrentFS:
 					bucketName := fmt.Sprintf("%s-dice-fs", project)
-					dirs := utils.GetFsDirs(bucketName, dataSourceId, assesBearer)
+					dirs := utils.GetCurrentDirs(bucketName, dataSourceId, assesBearer)
 
-					if len(dirs) > 2 {
+					if len(dirs) > 0 {
 						fmt.Printf("Excess (%d) folders in %s\n", len(dirs)-2, dataSourceId)
 					}
+
+				case dice.ListAllFS:
+					bucketName := fmt.Sprintf("%s-dice-fs", project)
+					dirs := []string{}
+					dirs = append(dirs, utils.GetTransactionsDirs(bucketName, dataSourceId, assesBearer)...)
+					dirs = append(dirs, utils.GetCurrentDirs(bucketName, dataSourceId, assesBearer)...)
+					dirs = append(dirs, utils.GetDeltaDirs(bucketName, dataSourceId, assesBearer)...)
+
+					err := utils.WriteToFile(fmt.Sprintf("./jobs/%s.log", dataSourceId), []byte(strings.Join(dirs, "\n")))
+					if err != nil {
+						fmt.Println("Error writing file:", err)
+						return
+					}
+					fmt.Printf("Data written successfully %s\n", dataSourceId)
 
 				default:
 					fmt.Println("CMD provided does not match with predefined cases, aborting...")
