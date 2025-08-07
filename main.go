@@ -188,12 +188,17 @@ func main() {
 					dirs = append(dirs, utils.GetCurrentDirs(bucketName, dataSourceId, assesBearer)...)
 					dirs = append(dirs, utils.GetDeltaDirs(bucketName, dataSourceId, assesBearer)...)
 
-					err := utils.WriteToFile(fmt.Sprintf("./jobs/%s.log", dataSourceId), []byte(strings.Join(dirs, "\n")))
-					if err != nil {
-						fmt.Println("Error writing file:", err)
-						return
+					if len(dirs) > 0 {
+						err := utils.WriteToFile(
+							fmt.Sprintf("./jobs/%s.log", dataSourceId),
+							[]byte(strings.Join(dirs, "\n")+"\n"),
+						)
+						if err != nil {
+							fmt.Println("Error writing file:", err)
+							return
+						}
+						fmt.Printf("Data written successfully for %s\n", dataSourceId)
 					}
-					fmt.Printf("Data written successfully for %s\n", dataSourceId)
 
 				default:
 					fmt.Println("CMD provided does not match with predefined cases, aborting...")
