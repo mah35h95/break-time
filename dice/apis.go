@@ -28,6 +28,8 @@ const (
 	ListCurrentFS     string = "list_current_fs"
 	ListAllFS         string = "list_all_fs"
 	DeleteStorage     string = "delete_storage"
+	ToNewLake         string = "to_new_lake"
+	FromNewLake       string = "from_new_lake"
 )
 
 // ValidateToken - validates token with dice meta api
