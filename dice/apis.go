@@ -104,7 +104,7 @@ func ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, httpMethod, cmd, stringBody
 	}
 	defer response.Body.Close()
 
-	fmt.Printf("Job %s has been triggered to be %s.\n", dataSourceId, cmd)
+	fmt.Printf("Job %s has been triggered to be %s. Status: %d\n", dataSourceId, cmd, response.StatusCode)
 
 	return nil
 }
@@ -149,7 +149,7 @@ func DeleteJob(dataSourceId string, metaSvcUrl string, bearer string) error {
 	}
 	defer response.Body.Close()
 
-	fmt.Printf("Job %s has been triggered to be deleted.\n", dataSourceId)
+	fmt.Printf("Job %s has been triggered to be deleted. Status: %d\n", dataSourceId, response.StatusCode)
 
 	return nil
 }
@@ -270,7 +270,11 @@ func DeleteHydratedResources(dataSourceId string, metaSvcUrl string, bearer stri
 	}
 	defer response.Body.Close()
 
-	fmt.Printf("Job %s has been triggered to clean up the hydrated resources.\n", dataSourceId)
+	fmt.Printf(
+		"Job %s has been triggered to clean up the hydrated resources. Status: %d\n",
+		dataSourceId,
+		response.StatusCode,
+	)
 
 	return nil
 }
