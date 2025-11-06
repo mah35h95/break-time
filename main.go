@@ -127,6 +127,13 @@ func main() {
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Edit, body)
 
 				case dice.ToNewLake:
+					if strings.HasPrefix(dataSourceId, "bigquery-source.bigquery.prod_2434_entdataingest_05104f.") {
+						err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Stop, body)
+						if err != nil {
+							return
+						}
+					}
+
 					body = `{"newLakeJob":true}`
 					err = dice.ExecuteJobCmd(dataSourceId, metaSvcUrl, bearer, http.MethodPost, dice.Edit, body)
 
